@@ -27,20 +27,20 @@ endif
 
 ifneq ($(wildcard $(srctree)/include/crypto/internal/rsa.h),)
     $(warning [DEFEX] INTEGRITY_ENABLE)
-    INTEGRITY_ENABLE=true
+    INTEGRITY_ENABLE=false
 endif
 
 # caches to enable
-CACHES_ENABLE=true
+CACHES_ENABLE=false
 
 # OEM Unlock dependency
-OEM_UNLOCK_DEPENDENCY=true
+OEM_UNLOCK_DEPENDENCY=false
 
 # use the ramdisk or system_root to store rules file
-RAMDISK_ENABLE=true
+RAMDISK_ENABLE=false
 
 # do signing for rules
-SIGN_ENABLE=true
+SIGN_ENABLE=false
 
 defex-y := core/defex_common.o
 defex-y += core/defex_lsm.o
@@ -234,4 +234,4 @@ else
     EXTRA_AFLAGS += $(DEFEX_DEFINES)
 endif
 
-obj-$(CONFIG_SECURITY_DEFEX) := $(defex-y)
+obj-$(CONFIG_SECURITY_DEFEX) := $(defex-n)

@@ -1187,7 +1187,7 @@ CHECKFLAGS += $(if $(CONFIG_64BIT),-m64,-m32)
 # ifeq ($(CONFIG_EXYNOS_VARIANT1),y)
 VARIANTINCLUDE := \
                 $(if $(building_out_of_srctree),-I$(srctree)/include/variant1) \
-                -I$(objtree)/include/variant1
+                -I$(KERNEL_ROOT)/include/variant1
 # endif
 LINUXINCLUDE += $(VARIANTINCLUDE)
 
