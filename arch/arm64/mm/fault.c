@@ -791,15 +791,15 @@ static int do_bad(unsigned long far, unsigned int esr, struct pt_regs *regs)
 	((unsigned long)(addr) >= (unsigned long)KERNEL_START &&	\
 	 (unsigned long)(addr) <= (unsigned long)KERNEL_END)
 
-static phys_addr_t show_virt_to_phys(unsigned long addr)
-{
-	if (!is_vmalloc_or_module_addr((void *)addr) ||
-			__is_in_kernel_image(addr))
-		return __pa(addr);
-	else
-		return page_to_phys(vmalloc_to_page((void *)addr)) +
-		       offset_in_page(addr);
-}
+//static phys_addr_t show_virt_to_phys(unsigned long addr)
+//{
+//	if (!is_vmalloc_or_module_addr((void *)addr) ||
+//			__is_in_kernel_image(addr))
+//		return __pa(addr);
+//	else
+//		return page_to_phys(vmalloc_to_page((void *)addr)) +
+//		       offset_in_page(addr);
+//}
 
 static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
 {
