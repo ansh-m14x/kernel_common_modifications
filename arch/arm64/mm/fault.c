@@ -831,15 +831,7 @@ static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
 		 */
 		siaddr  = untagged_addr(far);
 	}
-	if (IS_ENABLED(CONFIG_SEC_DEBUG_FAULT_MSG_ADV)) {
-		if (esr & ESR_ELx_FnV)
-			pr_auto(ASL1, "%s (0x%08x), FAR not valid\n",
-				      inf->name, esr);
-		else
-			pr_auto(ASL1, "%s (0x%08x) at 0x%016lx[0x%09llx]\n",
-				      inf->name, esr, siaddr,
-				      show_virt_to_phys(siaddr));
-	}
+	add_taint(TAINT_MACHINE_CHECK, LOCKDEP_STILL_OK);
 	trace_android_rvh_do_sea(siaddr, esr, regs);
 	arm64_notify_die(inf->name, regs, inf->sig, inf->code, siaddr, esr);
 

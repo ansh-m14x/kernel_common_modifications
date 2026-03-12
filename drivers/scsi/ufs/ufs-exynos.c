@@ -754,6 +754,12 @@ static inline int exynos_ufs_start(struct ufs_hba *hba)
 
 	reg = std_readl(handle, REG_CONTROLLER_ENABLE);
 	reg |= CONTROLLER_ENABLE;
+	hci_writel(ufs, 0xa, HCI_DATA_REORDER);
+	hci_writel(ufs, PRDT_SET_SIZE(12), HCI_TXPRDT_ENTRY_SIZE);
+	hci_writel(ufs, PRDT_SET_SIZE(12), HCI_RXPRDT_ENTRY_SIZE);
+	hci_writel(ufs, BIT(hba->nutrs) - 1, HCI_UTRL_NEXUS_TYPE);
+	hci_writel(ufs, BIT(hba->nutmrs) - 1, HCI_UTMRL_NEXUS_TYPE);
+	hci_writel(ufs, 0xf, HCI_AXIDMA_RWDATA_BURST_LEN);
 
 	if (exynos_crypto_enable(hba))
 		reg |= CRYPTO_GENERAL_ENABLE;
