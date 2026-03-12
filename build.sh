@@ -35,7 +35,7 @@ export DEPMOD=depmod
 OUTDIR="$KERNEL_ROOT/out"
 MODULES_OUTDIR="$KERNEL_ROOT/modules_out"
 FINAL_STAGING="/root/staging"
-IN_DLKM="/root/backups/org_modules"
+IN_DLKM="/root/backups/modules"
 
 # --- 4. Preparation ---
 echo "Cleaning old build artifacts..."
