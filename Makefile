@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 VERSION = 5
 PATCHLEVEL = 15
-SUBLEVEL = 189
+SUBLEVEL = 192
 EXTRAVERSION =
 NAME = Trick or Treat
 
@@ -1170,7 +1170,7 @@ KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CPPFLAGS) $(KBUILD
 KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS))
 
 # userspace programs are linked via the compiler, use the correct linker
-ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_LD_IS_LLD),yy)
+ifdef CONFIG_CC_IS_CLANG
 KBUILD_USERLDFLAGS += $(call cc-option, --ld-path=$(LD))
 endif
 
@@ -1187,7 +1187,7 @@ CHECKFLAGS += $(if $(CONFIG_64BIT),-m64,-m32)
 # ifeq ($(CONFIG_EXYNOS_VARIANT1),y)
 VARIANTINCLUDE := \
                 $(if $(building_out_of_srctree),-I$(srctree)/include/variant1) \
-                -I$(objtree)/include/variant1
+                -I$(KERNEL_ROOT)/include/variant1
 # endif
 LINUXINCLUDE += $(VARIANTINCLUDE)
 

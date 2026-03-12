@@ -35,7 +35,7 @@ export DEPMOD=depmod
 OUTDIR="$KERNEL_ROOT/out"
 MODULES_OUTDIR="$KERNEL_ROOT/modules_out"
 FINAL_STAGING="/root/staging"
-IN_DLKM="/root/org_modules" # Source for your original modules.load
+IN_DLKM="/root/backups/org_modules"
 
 # --- 4. Preparation ---
 echo "Cleaning old build artifacts..."
@@ -48,7 +48,10 @@ echo "Configuring and Building for $DEVICE..."
 echo "===================================================="
 
 # Step A: Generate Config
-make -j$(nproc --all) O=out ${DEVICE}_defconfig custom.config
+make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config
+
+# Step B: Prepare.
+make -j4 prepare O=out
 
 # Step B: Compile Kernel Image
 make -j$(nproc --all) O=out
@@ -65,10 +68,10 @@ echo "Filtering modules based on OEM modules.load..."
 missing_modules=""
 
 # 1. Copy essential metadata FIRST so depmod can see them
-#echo "Copying metadata for depmod..."
-#cp "$MODULES_OUTDIR/lib/modules/"*"/modules.builtin" "$FINAL_STAGING/lib/modules/0.0/"
-#cp "$MODULES_OUTDIR/lib/modules/"*"/modules.order" "$FINAL_STAGING/lib/modules/0.0/"
-#cp "$IN_DLKM/modules.load" "$FINAL_STAGING/lib/modules/0.0/modules.load"
+echo "Copying metadata for depmod..."
+cp "$MODULES_OUTDIR/lib/modules/"*"/modules.builtin" "$FINAL_STAGING/lib/modules/0.0/"
+cp "$MODULES_OUTDIR/lib/modules/"*"/modules.order" "$FINAL_STAGING/lib/modules/0.0/"
+cp "$IN_DLKM/modules.load" "$FINAL_STAGING/lib/modules/0.0/modules.load"
 #for file in $(find . -name "*.ko"); do cp "$file" "$FINAL_STAGING/lib/modules/0.0/"; done
 
 # We read the list of modules required for boot
@@ -78,32 +81,32 @@ while read -r module; do
     found=$(find "$MODULES_OUTDIR/lib/modules" -name "$module" -type f | head -n 1)
     
     if [ -f "$found" ]; then
-        #cp -f "$found" "$FINAL_STAGING/lib/modules/0.0/"
+#        cp -f "$found" "$FINAL_STAGING/lib/modules/0.0/"
     else
         missing_modules="$missing_modules $module"
     fi
 done < "$IN_DLKM/modules.load"
-#
+
 if [ -n "$missing_modules" ]; then
     echo "WARNING: The following modules from modules.load were not found: $missing_modules"
 fi
 
 #echo "Generating modules.dep using System.map..."
-# Use the dummy version '0.0' to avoid version string issues with '@'
+## Use the dummy version '0.0' to avoid version string issues with '@'
 #depmod -b "$FINAL_STAGING" -F "$OUTDIR/System.map" 0.0
-
+#
 #echo "Fixing module paths for Android (Absolute paths)..."
-# Converts relative paths in modules.dep to /lib/modules/...
+## Converts relative paths in modules.dep to /lib/modules/...
 #sed -i 's/\([^ ]\+\)/\/lib\/modules\/\1/g' "$FINAL_STAGING/lib/modules/0.0/modules.dep"
 
 # --- 7. Finalizing Output ---
 # Copy the final binaries to staging
-cp "$OUTDIR/arch/arm64/boot/Image" ~/
+cp "$OUTDIR/arch/arm64/boot/Image" "$KERNEL_ROOT/Image"
 #cp "$OUTDIR/System.map" "$FINAL_STAGING/System.map"
 
 echo -e "\n\033[1;32m====================================================\033[0m"
 echo -e "\033[1;32mBUILD SUCCESSFUL!\033[0m"
-echo -e "Kernel Image: ~/"
+echo -e "Kernel Image: $KERNEL_ROOT/Image"
 echo -e "\033[1;32m====================================================\033[0m"
 
 # --- 8. Cleaning ---

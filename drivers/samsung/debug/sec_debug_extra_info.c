@@ -1091,7 +1091,7 @@ EXPORT_SYMBOL(secdbg_exin_set_hardlockup_ehld);
 
 static int set_debug_reset_extra_info_proc_show(struct seq_file *m, void *v)
 {
-	char buf[ETR_A_PROC_SIZE];
+	static char buf[ETR_A_PROC_SIZE];
 
 	secdbg_exin_get_extra_info_A(buf);
 	seq_printf(m, "%s", buf);
