@@ -53,13 +53,13 @@ static int __alloc(struct device *dev, struct icpu_buf *ibuf)
 	return 0;
 }
 
-static void __free(struct icpu_buf *buf)
-{
-	if (!buf || !buf->data)
-		return;
-
-	CALL_VOID_BUFOP((struct is_priv_buf *)buf->data, free, buf->data);
-}
+//static void __free(struct icpu_buf *buf)
+//{
+//	if (!buf || !buf->data)
+//		return;
+//
+//	CALL_VOID_BUFOP((struct is_priv_buf *)buf->data, free, buf->data);
+//}
 
 static void __sync_for_device(struct icpu_buf *buf)
 {
@@ -72,7 +72,7 @@ static void __sync_for_device(struct icpu_buf *buf)
 
 struct icpu_buf_ops icpu_buf_ops_pmem = {
 	.alloc = __alloc,
-	.free = __free,
+	//.free = __free,
 	.sync_for_device = __sync_for_device,
 };
 
