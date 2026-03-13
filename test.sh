@@ -81,7 +81,7 @@ while read -r module; do
     found=$(find "$MODULES_OUTDIR/lib/modules" -name "$module" -type f | head -n 1)
     
     if [ -f "$found" ]; then
-#        cp -f "$found" "$FINAL_STAGING/lib/modules/0.0/"
+        echo "oi"
     else
         missing_modules="$missing_modules $module"
     fi

@@ -594,21 +594,21 @@ static int xhci_alloc_segments_for_ring_uram(struct xhci_hcd *xhci,
 					     enum xhci_ring_type type,
 					     unsigned int max_packet, gfp_t flags, u32 endpoint_type)
 {
-	struct xhci_segment *prev;
-	bool chain_links;
+	struct xhci_segment *prev = NULL;
+	bool chain_links = false;
 
 	/* Set chain bit for 0.95 hosts, and for isoc rings on AMD 0.96 host */
-	chain_links = ! !(xhci_link_trb_quirk(xhci) || (type == TYPE_ISOC && (xhci->quirks & XHCI_AMD_0x96_HOST)));
-
-	if (type == TYPE_ISOC) {
-		prev = xhci_segment_alloc_uram_ep(xhci, cycle_state, max_packet, flags, 0, endpoint_type);
-	} else if (type == TYPE_EVENT) {
-		prev = xhci_segment_alloc_uram(xhci, cycle_state, max_packet, flags);
-	} else {
-		xhci_err(xhci, "Unexpected TYPE for URAM allocation!\n");
-		return -ENOMEM;
-	}
-
+//	chain_links = ! !(xhci_link_trb_quirk(xhci) || (type == TYPE_ISOC && (xhci->quirks & XHCI_AMD_0x96_HOST)));
+//
+//	if (type == TYPE_ISOC) {
+//		prev = xhci_segment_alloc_uram_ep(xhci, cycle_state, max_packet, flags, 0, endpoint_type);
+//	} else if (type == TYPE_EVENT) {
+//		prev = xhci_segment_alloc_uram(xhci, cycle_state, max_packet, flags);
+//	} else {
+//		xhci_err(xhci, "Unexpected TYPE for URAM allocation!\n");
+//		return -ENOMEM;
+//	}
+//
 	if (!prev)
 		return -ENOMEM;
 	num_segs--;

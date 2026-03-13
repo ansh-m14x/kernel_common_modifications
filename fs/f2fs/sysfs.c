@@ -1128,7 +1128,6 @@ out:
 		return count;
 	}
 
-<<<<<<< HEAD
 #ifdef CONFIG_F2FS_SEC_SYSFS_DISCARD_SLAB_THRESHOLD
 	if (!strcmp(a->attr.name, "discard_cmd_slab_thresh_MB")) {
 		SM_I(sbi)->dcc_info->discard_cmd_slab_thresh_cnt =
@@ -1144,9 +1143,7 @@ out:
 #endif
 
 	*ui = (unsigned int)t;
-=======
 	__sbi_store_value(a, sbi, ptr + a->offset, t);
->>>>>>> google_gki/android13-5.15-lts
 
 	return count;
 }
@@ -1337,9 +1334,9 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, data_io_flag, data_io_flag);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, node_io_flag, node_io_flag);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, gc_urgent_high_remaining, gc_urgent_high_remaining);
 F2FS_RW_ATTR(CPRC_INFO, ckpt_req_control, ckpt_thread_ioprio, ckpt_thread_ioprio);
-F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_gc_stat, sec_stat);
-F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_io_stat, sec_stat);
-F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_fsck_stat, sec_fsck_stat);
+//F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_gc_stat, sec_stat);
+//F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_io_stat, sec_stat);
+//F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_fsck_stat, sec_fsck_stat);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_heimdallfs_stat, sec_heimdallfs_stat);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_part_best_extents, s_sec_part_best_extents);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_part_current_extents, s_sec_part_current_extents);
@@ -1347,7 +1344,7 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_part_score, s_sec_part_score);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_defrag_writes_kb, s_sec_defrag_writes_kb);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_num_apps, s_sec_num_apps);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_capacity_apps_kb, s_sec_capacity_apps_kb);
-F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_defrag_stat, s_sec_part_best_extents);
+//F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_defrag_stat, s_sec_part_best_extents);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_hqm_preserve, sec_hqm_preserve);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_fua_mode, s_sec_cond_fua_mode);
 #ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
@@ -1505,9 +1502,9 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(node_io_flag),
 	ATTR_LIST(gc_urgent_high_remaining),
 	ATTR_LIST(ckpt_thread_ioprio),
-	ATTR_LIST(sec_gc_stat),
-	ATTR_LIST(sec_io_stat),
-	ATTR_LIST(sec_fsck_stat),
+	//ATTR_LIST(sec_gc_stat),
+	//ATTR_LIST(sec_io_stat),
+	//ATTR_LIST(sec_fsck_stat),
 	ATTR_LIST(sec_heimdallfs_stat),
 	ATTR_LIST(sec_part_best_extents),
 	ATTR_LIST(sec_part_current_extents),
@@ -1515,7 +1512,7 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(sec_defrag_writes_kb),
 	ATTR_LIST(sec_num_apps),
 	ATTR_LIST(sec_capacity_apps_kb),
-	ATTR_LIST(sec_defrag_stat),
+	//ATTR_LIST(sec_defrag_stat),
 	ATTR_LIST(sec_hqm_preserve),
 	ATTR_LIST(sec_fua_mode),
 	ATTR_LIST(dirty_segments),
