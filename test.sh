@@ -101,15 +101,16 @@ fi
 
 # --- 7. Finalizing Output ---
 # Copy the final binaries to staging
-cp "$OUTDIR/arch/arm64/boot/Image" "$KERNEL_ROOT/Image"
+cp "$OUTDIR/arch/arm64/boot/Image" "$HOME/Image"
 #cp "$OUTDIR/System.map" "$FINAL_STAGING/System.map"
 
 echo -e "\n\033[1;32m====================================================\033[0m"
 echo -e "\033[1;32mBUILD SUCCESSFUL!\033[0m"
-echo -e "Kernel Image: $KERNEL_ROOT/Image"
+echo -e "Kernel Image: $HOME/Image"
 echo -e "\033[1;32m====================================================\033[0m"
 
 # --- 8. Cleaning ---
 #rm -fr $OUTDIR
 #rm -fr $MODULES_OUTDIR
+rm -fr $HOME/staging
 # -------------------

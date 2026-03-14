@@ -80,9 +80,7 @@ while read -r module; do
     # Locate the built .ko file
     found=$(find "$MODULES_OUTDIR/lib/modules" -name "$module" -type f | head -n 1)
     
-    if [ -f "$found" ]; then
-#        cp -f "$found" "$FINAL_STAGING/lib/modules/0.0/"
-    else
+    if ! [[ -f "$found" ]]; then
         missing_modules="$missing_modules $module"
     fi
 done < "$IN_DLKM/modules.load"
@@ -101,12 +99,11 @@ fi
 
 # --- 7. Finalizing Output ---
 # Copy the final binaries to staging
-cp "$OUTDIR/arch/arm64/boot/Image" "$KERNEL_ROOT/Image"
-#cp "$OUTDIR/System.map" "$FINAL_STAGING/System.map"
+cp "$OUTDIR/arch/arm64/boot/Image" "$HOME/Image"
 
 echo -e "\n\033[1;32m====================================================\033[0m"
 echo -e "\033[1;32mBUILD SUCCESSFUL!\033[0m"
-echo -e "Kernel Image: $KERNEL_ROOT/Image"
+echo -e "Kernel Image: $HOME/Image"
 echo -e "\033[1;32m====================================================\033[0m"
 
 # --- 8. Cleaning ---
