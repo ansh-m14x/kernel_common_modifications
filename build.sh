@@ -48,7 +48,7 @@ echo "Configuring and Building for $DEVICE..."
 echo "===================================================="
 
 # Step A: Generate Config
-make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config
+make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config perf.config custom.config
 
 # Step B: Prepare.
 make -j4 prepare O=out
@@ -107,6 +107,7 @@ echo -e "Kernel Image: $HOME/Image"
 echo -e "\033[1;32m====================================================\033[0m"
 
 # --- 8. Cleaning ---
-rm -fr $OUTDIR
-rm -fr $MODULES_OUTDIR
+#rm -fr $OUTDIR
+#rm -fr $MODULES_OUTDIR
+rm -fr $FINAL_STAGING
 # -------------------

@@ -492,7 +492,7 @@ void secdbg_base_set_info_hard_lockup(unsigned int cpu, struct task_struct *task
 
 /* SEC DEBUG EXTAR INFO */
 #define MAX_ITEM_KEY_LEN		(16)
-#define MAX_ITEM_VAL_LEN		(1008)
+#define MAX_ITEM_VAL_LEN		(512)
 
 #define SEC_DEBUG_SHARED_MAGIC0 0xFFFFFFFF
 #define SEC_DEBUG_SHARED_MAGIC1 0x95308180
