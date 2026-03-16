@@ -18,12 +18,12 @@ jobs:
           large-packages: true
           swap-storage: true
 
-  #    - name: Checkout Source (Minimal Branch)
-  #      uses: actions/checkout@v4
-    #    with:
-  #        ref: minimal
-    #      submodules: false 
-      #    fetch-depth: 1
+      - name: Checkout Source (Minimal Branch)
+        uses: actions/checkout@v4
+        with:
+          ref: minimal
+          submodules: false 
+          fetch-depth: 1
 
       - name: Install LLVM 22 & Tools
         run: |
