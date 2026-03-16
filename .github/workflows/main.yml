@@ -98,7 +98,7 @@ jobs:
       - name: Upload Kernel Image
         uses: actions/upload-artifact@v4
         with:
-          name: Kernel-Image-m14x-Minimal
+          name: kernel-image-m14x-basic
           path: Image_m14x
           retention-days: 2
 
