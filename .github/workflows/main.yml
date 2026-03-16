@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: minimal
-          submodules: 'recursive'
+          submodules: false 
           fetch-depth: 1
 
       - name: Install LLVM 22 & Tools
