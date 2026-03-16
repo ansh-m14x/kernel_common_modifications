@@ -1,4 +1,4 @@
-name: Build Android Kernel (Minimal Branch)
+name: Build Kernel Action
 
 on:
   workflow_dispatch:
@@ -21,21 +21,21 @@ jobs:
       - name: Checkout Source (Minimal Branch)
         uses: actions/checkout@v4
         with:
-          ref: minimal
-          submodules: false 
+          ref: basic
+          submodules: 'recursive'
           fetch-depth: 1
 
       - name: Install LLVM 22 & Tools
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y \
-            bc bison build-essential flex git lld llvm python3 \
-            ccache libssl-dev libelf-dev libncurses-dev libufdt-dev \
-            kmod dwarves basic-bsd-utils binutils-dev \
-            libyaml-dev libcap-dev libmpc-dev libgmp-dev libmpfr-dev \
-            lz4 xz-utils zlib1g-dev \
-            rsync u-boot-tools
-          
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential flex git lld llvm python3 \
+          git curl wget bc bison flex libssl-dev libelf-dev \
+          python3 python-is-python3 make gcc gcc-aarch64-linux-gnu \
+          binutils binutils-aarch64-linux-gnu g++ cpio zip unzip \
+          lz4 zstd xz-utils libncurses-dev libncurses5-dev \
+          kmod rsync lld llvm clang dwarves pahole ccache \
+          device-tree-compiler zlib1g-dev libc6-dev-i386 cmake ninja-build 
+
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 22
@@ -75,7 +75,7 @@ jobs:
           OUTDIR="$KERNEL_ROOT/out"
           
           echo "===================================================="
-          echo "Configuring and Building for $DEVICE na branch minimal..."
+          echo "Configuring and Building for $DEVICE"
           echo "===================================================="
 
           # Step A: Generate Config
@@ -100,7 +100,7 @@ jobs:
         with:
           name: Kernel-Image-m14x-Minimal
           path: Image_m14x
-          retention-days: 5
+          retention-days: 2
 
       - name: Cleanup
         if: always()
