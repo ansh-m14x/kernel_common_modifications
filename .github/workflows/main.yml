@@ -27,9 +27,14 @@ jobs:
 
       - name: Install LLVM 22 & Tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y bc bison build-essential flex git lld llvm python3 \
-          ccache libssl-dev libelf-dev libncurses-dev libufdt-dev kmod
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            bc bison build-essential flex git lld llvm python3 \
+            ccache libssl-dev libelf-dev libncurses-dev libufdt-dev \
+            kmod dwarves basic-bsd-utils binutils-dev \
+            libyaml-dev libcap-dev libmpc-dev libgmp-dev libmpfr-dev \
+            lz4 xz-utils zlib1g-dev \
+            rsync u-boot-tools
           
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
