@@ -25,6 +25,9 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 1
 
+      - name : Patch ReSukiSu
+        curl -LSs https://raw.githubusercontent.com/prisma-droid-ofc/ReSukiSU---Fork/main/kernel/setup.sh | bash
+
       - name: Install LLVM 22 & Tools
         run: |
           sudo apt-get update
