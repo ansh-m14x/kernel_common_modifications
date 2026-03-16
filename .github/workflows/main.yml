@@ -79,7 +79,7 @@ jobs:
           echo "===================================================="
 
           # Step A: Generate Config
-          make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config perf.config
+          make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config perf.config custom.config
 
           # Step B: Prepare
           make -j$(nproc --all) prepare O=out
