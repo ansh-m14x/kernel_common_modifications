@@ -1,0 +1,102 @@
+name: Build Android Kernel (Minimal Branch)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Maximize Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - name: Checkout Source (Minimal Branch)
+        uses: actions/checkout@v4
+        with:
+          ref: minimal
+          submodules: 'recursive'
+          fetch-depth: 1
+
+      - name: Install LLVM 22 & Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential flex git lld llvm python3 \
+          ccache libssl-dev libelf-dev libncurses-dev libufdt-dev kmod
+          
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 22
+          sudo apt-get install -y clang-22 lld-22
+
+      - name: Build Kernel
+        run: |
+          # --- 1. ABI & KMI Settings (Nuke checks) ---
+          export ABI_DEFINITION=
+          export KMI_SYMBOL_LIST_STRICT_MODE=0
+          export SKIP_ABI_CHECKS=1
+          export KMI_ENFORCE=0
+
+          # --- 2. Device & Toolchain variables ---
+          export PATH=/usr/lib/llvm-22/bin:$PATH
+          export KERNEL_REPO="$GITHUB_WORKSPACE"
+          export KERNEL_ROOT="$GITHUB_WORKSPACE"
+          export GKI_ROOT="$GITHUB_WORKSPACE"
+          export DEVICE="m14x"
+          export ARCH=arm64
+          export SUBARCH=arm64
+          export CC="ccache clang-22"
+          export HOSTCC="ccache clang-22"
+          export LANG=en_US.UTF-8
+          export LC_ALL=en_US.UTF-8
+          export LLVM=1
+          export LTO=thin
+          export LLVM_IAS=1
+          export TARGET_SOC=s5e8535
+          export SOC_NAME=s5e8535
+          export DTC_FLAGS="-@"
+          export PLATFORM_VERSION=15
+          export ANDROID_MAJOR_VERSION=t
+          export DEPMOD=depmod
+
+          # --- 3. Internal Paths ---
+          OUTDIR="$KERNEL_ROOT/out"
+          
+          echo "===================================================="
+          echo "Configuring and Building for $DEVICE na branch minimal..."
+          echo "===================================================="
+
+          # Step A: Generate Config
+          make -j$(nproc --all) O=out ${DEVICE}_defconfig su.config perf.config
+
+          # Step B: Prepare
+          make -j$(nproc --all) prepare O=out
+
+          # Step C: Compile Kernel Image
+          make -j$(nproc --all) O=out
+
+          # Move a imagem final para a raiz para facilitar o upload
+          if [ -f "out/arch/arm64/boot/Image" ]; then
+            cp out/arch/arm64/boot/Image ./Image_m14x
+          else
+            echo "ERRO: Image não encontrada em out/arch/arm64/boot/Image"
+            exit 1
+          fi
+
+      - name: Upload Kernel Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel-Image-m14x-Minimal
+          path: Image_m14x
+          retention-days: 5
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf out/
