@@ -89,7 +89,7 @@ jobs:
 
           # Move a imagem final para a raiz para facilitar o upload
           if [ -f "out/arch/arm64/boot/Image" ]; then
-            cp out/arch/arm64/boot/Image ./Image_m14x
+            cp out/arch/arm64/boot/Image ./Image
           else
             echo "ERRO: Image não encontrada em out/arch/arm64/boot/Image"
             exit 1
@@ -99,7 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kernel-image-m14x-basic
-          path: Image_m14x
+          path: Image
           retention-days: 2
 
       - name: Cleanup
