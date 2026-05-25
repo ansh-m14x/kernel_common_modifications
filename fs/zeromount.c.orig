@@ -36,8 +36,6 @@ LIST_HEAD(zeromount_rules_list);
 DEFINE_SPINLOCK(zeromount_lock);
 
 atomic_t zeromount_enabled = ATOMIC_INIT(0);
-atomic_t zeromount_hide_adb = ATOMIC_INIT(0);
-EXPORT_SYMBOL(zeromount_hide_adb);
 static atomic_t zeromount_dirs_count = ATOMIC_INIT(0);
 static atomic_t zeromount_rule_count = ATOMIC_INIT(0);
 static DECLARE_BITMAP(zm_bloom, ZM_BLOOM_BITS);
@@ -1457,31 +1455,8 @@ static ssize_t debug_store(struct kobject *kobj, struct kobj_attribute *attr,
 static struct kobj_attribute debug_attr =
 	__ATTR(debug, 0600, debug_show, debug_store);
 
-static ssize_t hide_adb_show(struct kobject *kobj, struct kobj_attribute *attr,
-			     char *buf)
-{
-	return sprintf(buf, "%d\n", atomic_read(&zeromount_hide_adb));
-}
-
-static ssize_t hide_adb_store(struct kobject *kobj, struct kobj_attribute *attr,
-			      const char *buf, size_t count)
-{
-	int val;
-
-	if (kstrtoint(buf, 10, &val) < 0)
-		return -EINVAL;
-	if (val < 0 || val > 1)
-		return -EINVAL;
-	atomic_set(&zeromount_hide_adb, val);
-	return count;
-}
-
-static struct kobj_attribute hide_adb_attr =
-	__ATTR(hide_adb, 0600, hide_adb_show, hide_adb_store);
-
 static struct attribute *zeromount_attrs[] = {
 	&debug_attr.attr,
-	&hide_adb_attr.attr,
 	NULL,
 };
 

@@ -15,6 +15,12 @@
 #include <linux/sched.h>
 #include <linux/bitops.h>
 
+struct inode;
+struct dentry;
+struct kstatfs;
+struct file;
+struct filename;
+
 #define ZM_BLOOM_BITS     4096
 #define ZM_BLOOM_SHIFT    12
 #define ZM_BLOOM_MASK     (ZM_BLOOM_BITS - 1)
@@ -152,6 +158,7 @@ extern spinlock_t zeromount_lock;
 
 #ifdef CONFIG_ZEROMOUNT
 extern atomic_t zeromount_enabled;
+extern atomic_t zeromount_hide_adb;
 
 bool zeromount_should_skip(void);
 char *zeromount_resolve_path(const char *pathname);
