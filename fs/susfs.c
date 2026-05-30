@@ -434,6 +434,9 @@ out_copy_to_user:
 /* sus_kstat */
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 static DEFINE_MUTEX(susfs_mutex_lock_sus_kstat);
+#ifdef CONFIG_KSU_SUSFS_HARDENED
+static DEFINE_SPINLOCK(susfs_spin_lock_sus_kstat);
+#endif
 static DEFINE_HASHTABLE(SUS_KSTAT_HLIST, 10);
 
 static int susfs_mark_inode_sus_kstat(char *target_pathname, struct st_susfs_sus_kstat_hlist *new_entry) {
