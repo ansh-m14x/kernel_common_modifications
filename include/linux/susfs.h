@@ -235,6 +235,20 @@ void susfs_show_version(void __user **user_info);
 
 void susfs_start_sdcard_monitor_fn(void);
 
+#ifdef CONFIG_KSU_SUSFS_UNICODE_FILTER
+bool susfs_check_unicode_bypass(const char __user *filename);
+#endif
+
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
+int susfs_redirect_kstat(const char *path, struct kstat *stat);
+#endif
+
+#ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+bool susfs_is_hidden_name(const char *name, int namlen, uid_t caller_uid);
+bool susfs_is_hidden_ino(struct super_block *sb, unsigned long ino);
+void susfs_try_register_hidden_name(const char *pathname);
+#endif
+
 /* susfs_init */
 void susfs_init(void);
 
