@@ -242,13 +242,19 @@ void susfs_add_sus_path(void __user **user_info) {
 		}
 		set_bit(AS_FLAGS_SUS_PATH, &fi->inode.i_mapping->flags);
 		set_bit(AS_FLAGS_SUS_PATH, &inode->i_mapping->flags);
-		SUSFS_LOGI("flagged AS_FLAGS_SUS_PATH on pathname: '%s', fi->nodeid: %llu, fi->inode.i_ino: %lu, fi->inode.i_mapping->flags: 0x%lx\n", 
+#ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+		susfs_register_hidden_ino_internal(inode->i_sb, inode->i_ino);
+#endif		
+                SUSFS_LOGI("flagged AS_FLAGS_SUS_PATH on pathname: '%s', fi->nodeid: %llu, fi->inode.i_ino: %lu, fi->inode.i_mapping->flags: 0x%lx\n", 
 					info.target_pathname, fi->nodeid, fi->inode.i_ino, fi->inode.i_mapping->flags);
 		info.err = 0;
 		goto out_path_put_path;
 	}
 
 	set_bit(AS_FLAGS_SUS_PATH, &inode->i_mapping->flags);
+#ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+		susfs_register_hidden_ino_internal(inode->i_sb, inode->i_ino);
+#endif
 	SUSFS_LOGI("flagged AS_FLAGS_SUS_PATH on pathname: '%s', ino: '%lu', inode->i_mapping->flags: 0x%lx\n",
 				info.target_pathname, inode->i_ino, inode->i_mapping->flags);
 	info.err = 0;
@@ -327,11 +333,17 @@ static void susfs_run_sus_path_loop(void) {
 				}
 				set_bit(AS_FLAGS_SUS_PATH, &fi->inode.i_mapping->flags);
 				set_bit(AS_FLAGS_SUS_PATH, &inode->i_mapping->flags);
-				SUSFS_LOGI("re-flag AS_FLAGS_SUS_PATH on path '%s', fi->inode.i_ino: '%lu', fi->inode.i_mapping->flags: 0x%lx\n",
+#ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+		susfs_register_hidden_ino_internal(inode->i_sb, inode->i_ino);
+#endif				
+                                SUSFS_LOGI("re-flag AS_FLAGS_SUS_PATH on path '%s', fi->inode.i_ino: '%lu', fi->inode.i_mapping->flags: 0x%lx\n",
 						cursor->target_pathname, fi->inode.i_ino, fi->inode.i_mapping->flags);
 			} else {
 				set_bit(AS_FLAGS_SUS_PATH, &inode->i_mapping->flags);
-				SUSFS_LOGI("re-flag AS_FLAGS_SUS_PATH on path '%s', inode->i_ino: '%lu', inode->i_mapping->flags: 0x%lx\n",
+#ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+				susfs_register_hidden_ino_internal(inode->i_sb, inode->i_ino);
+#endif				
+                                SUSFS_LOGI("re-flag AS_FLAGS_SUS_PATH on path '%s', inode->i_ino: '%lu', inode->i_mapping->flags: 0x%lx\n",
 						cursor->target_pathname, inode->i_ino, inode->i_mapping->flags);
 			}
 			path_put(&path);
