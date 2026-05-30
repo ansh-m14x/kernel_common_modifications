@@ -102,8 +102,7 @@ static inline void susfs_set_current_proc_umounted(void) {
 }
 
 static inline bool susfs_is_current_proc_umounted_app(void) {
-	return (likely(test_thread_flag(TIF_PROC_UMOUNTED)) &&
-			current_uid().val >= 10000);
+    return likely(test_thread_flag(TIF_PROC_UMOUNTED));
 }
 
 #define SUSFS_IS_INODE_SUS_MAP(inode) \
