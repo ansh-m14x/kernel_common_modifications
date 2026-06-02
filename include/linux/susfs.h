@@ -241,6 +241,7 @@ bool susfs_check_unicode_bypass(const char __user *filename);
 
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
 int susfs_redirect_kstat(const char *path, struct kstat *stat);
+void susfs_add_sus_kstat_redirect(void __user **user_info);
 #endif
 
 #ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
