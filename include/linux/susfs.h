@@ -102,6 +102,22 @@ struct st_susfs_sus_kstat_hlist {
 };
 #endif
 
+/* sus_kstat_redirect */
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
+struct st_susfs_sus_kstat_redirect {
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
+	char redirected_pathname[SUSFS_MAX_LEN_PATHNAME];
+	int err;
+};
+
+struct st_susfs_sus_kstat_redirect_hlist {
+	unsigned long target_ino;
+	unsigned long target_dev;
+	struct st_susfs_sus_kstat_redirect info;
+	struct hlist_node node;
+};
+#endif
+
 /* spoof_uname */
 #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
 struct st_susfs_uname {
@@ -240,8 +256,8 @@ bool susfs_check_unicode_bypass(const char __user *filename);
 #endif
 
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
-int susfs_redirect_kstat(const char *path, struct kstat *stat);
 void susfs_add_sus_kstat_redirect(void __user **user_info);
+int susfs_redirect_kstat(struct inode *inode, struct kstat *stat);
 #endif
 
 #ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME

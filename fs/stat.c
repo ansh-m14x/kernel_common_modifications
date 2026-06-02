@@ -34,6 +34,11 @@
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 extern void susfs_sus_kstat_spoof_generic_fillattr(struct inode *inode, struct kstat *stat);
 #endif
+
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
+extern int susfs_redirect_kstat(struct inode *inode, struct kstat *stat);
+#endif
+
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 extern int susfs_get_non_sus_mnt_id_from_mnt(struct mount *orig_mnt);
 #endif
@@ -141,8 +146,12 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
 	{
 		int err = inode->i_op->getattr(mnt_userns, path, stat,
 					    request_mask, query_flags);
-		if (!err)
+		if (!err) {
 			susfs_sus_kstat_spoof_generic_fillattr(inode, stat);
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
+			susfs_redirect_kstat(inode, stat);
+#endif
+		}
 		return err;
 	}
 #else
@@ -151,6 +160,9 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
 #endif
 
 	generic_fillattr(mnt_userns, inode, stat);
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
+	susfs_redirect_kstat(inode, stat);
+#endif
 	return 0;
 }
 EXPORT_SYMBOL(vfs_getattr_nosec);

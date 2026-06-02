@@ -69,24 +69,122 @@ EXPORT_SYMBOL(susfs_check_unicode_bypass);
 #endif
 
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT_REDIRECT
-int susfs_redirect_kstat(const char *path, struct kstat *stat) {
-	struct path target_path;
-	struct kstat target_stat;
-	int err;
+static DEFINE_MUTEX(susfs_mutex_lock_sus_kstat_redirect);
+static DEFINE_HASHTABLE(SUS_KSTAT_REDIRECT_HLIST, 8);
+DEFINE_STATIC_SRCU(susfs_srcu_sus_kstat_redirect);
 
-	if (!path || !stat) return -EINVAL;
+void susfs_add_sus_kstat_redirect(void __user **user_info) {
+	struct st_susfs_sus_kstat_redirect info = {0};
+	struct st_susfs_sus_kstat_redirect_hlist *new_entry, *tmp_entry;
+	struct hlist_node *tmp_hlist_node;
+	struct path target_path, redirected_path;
+	struct inode *target_inode;
 
-	err = kern_path(path, LOOKUP_FOLLOW, &target_path);
-	if (err) return err;
-
-	err = vfs_getattr(&target_path, &target_stat, STATX_BASIC_STATS, AT_STATX_SYNC_AS_STAT);
-	if (!err) {
-		stat->size = target_stat.size;
-		stat->blocks = target_stat.blocks;
-		stat->mtime = target_stat.mtime;
-		stat->ctime = target_stat.ctime;
+	if (copy_from_user(&info, (struct st_susfs_sus_kstat_redirect __user*)*user_info, sizeof(info))) {
+		info.err = -EFAULT;
+		goto out_copy_to_user;
 	}
+
+	if (*info.target_pathname == '\0' || *info.redirected_pathname == '\0') {
+		info.err = -EINVAL;
+		goto out_copy_to_user;
+	}
+
+	info.err = kern_path(info.redirected_pathname, 0, &redirected_path);
+	if (info.err) {
+		SUSFS_LOGE("failed opening redirected file '%s'\n", info.redirected_pathname);
+		goto out_copy_to_user;
+	}
+	path_put(&redirected_path);
+
+	info.err = kern_path(info.target_pathname, 0, &target_path);
+	if (info.err) {
+		SUSFS_LOGE("failed opening target file '%s'\n", info.target_pathname);
+		goto out_copy_to_user;
+	}
+
+	target_inode = d_backing_inode(target_path.dentry);
+	if (!target_inode || !target_inode->i_mapping) {
+		info.err = -ENOENT;
+		goto out_path_put_target;
+	}
+
+	new_entry = kzalloc(sizeof(struct st_susfs_sus_kstat_redirect_hlist), GFP_KERNEL);
+	if (!new_entry) {
+		info.err = -ENOMEM;
+		goto out_path_put_target;
+	}
+
+	new_entry->target_ino = target_inode->i_ino;
+	new_entry->target_dev = target_inode->i_sb->s_dev;
+	memcpy(&new_entry->info, &info, sizeof(info));
+
+	mutex_lock(&susfs_mutex_lock_sus_kstat_redirect);
+	hash_for_each_possible_safe(SUS_KSTAT_REDIRECT_HLIST, tmp_entry, tmp_hlist_node, node, target_inode->i_ino) {
+		if (!strcmp(tmp_entry->info.target_pathname, info.target_pathname)) {
+			hash_del_rcu(&tmp_entry->node);
+			synchronize_srcu(&susfs_srcu_sus_kstat_redirect);
+			kfree(tmp_entry);
+			break;
+		}
+	}
+
+	hash_add_rcu(SUS_KSTAT_REDIRECT_HLIST, &new_entry->node, new_entry->target_ino);
+	set_bit(AS_FLAGS_SUS_KSTAT_REDIRECT, &target_inode->i_mapping->flags);
+	mutex_unlock(&susfs_mutex_lock_sus_kstat_redirect);
+
+	info.err = 0;
+	SUSFS_LOGI("redirected kstat from '%s' to '%s'\n", info.target_pathname, info.redirected_pathname);
+
+out_path_put_target:
 	path_put(&target_path);
+out_copy_to_user:
+	if (copy_to_user(&((struct st_susfs_sus_kstat_redirect __user*)*user_info)->err, &info.err, sizeof(info.err))) {
+		info.err = -EFAULT;
+	}
+}
+
+int susfs_redirect_kstat(struct inode *inode, struct kstat *stat) {
+	struct st_susfs_sus_kstat_redirect_hlist *entry;
+	int srcu_idx;
+	struct path redirected_path;
+	struct kstat redirected_stat;
+	int err = 0;
+	bool found = false;
+	char target_path_str[SUSFS_MAX_LEN_PATHNAME];
+
+	if (!inode || !inode->i_mapping || !test_bit(AS_FLAGS_SUS_KSTAT_REDIRECT, &inode->i_mapping->flags)) {
+		return 0;
+	}
+
+	if (!susfs_is_current_proc_umounted_app()) {
+		return 0;
+	}
+
+	srcu_idx = srcu_read_lock(&susfs_srcu_sus_kstat_redirect);
+	hash_for_each_possible_rcu(SUS_KSTAT_REDIRECT_HLIST, entry, node, inode->i_ino) {
+		if (entry->target_dev == inode->i_sb->s_dev) {
+			strncpy(target_path_str, entry->info.redirected_pathname, SUSFS_MAX_LEN_PATHNAME - 1);
+			found = true;
+			break;
+		}
+	}
+	srcu_read_unlock(&susfs_srcu_sus_kstat_redirect, srcu_idx);
+
+	if (found) {
+		err = kern_path(target_path_str, LOOKUP_FOLLOW, &redirected_path);
+		if (!err) {
+			err = vfs_getattr(&redirected_path, &redirected_stat, STATX_BASIC_STATS, AT_STATX_SYNC_AS_STAT);
+			if (!err) {
+				stat->size = redirected_stat.size;
+				stat->blocks = redirected_stat.blocks;
+				stat->mtime = redirected_stat.mtime;
+				stat->ctime = redirected_stat.ctime;
+				SUSFS_LOGI("redirected kstat applied for ino: %lu\n", inode->i_ino);
+			}
+			path_put(&redirected_path);
+		}
+	}
 	return err;
 }
 EXPORT_SYMBOL(susfs_redirect_kstat);
