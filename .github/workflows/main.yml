@@ -35,8 +35,6 @@ jobs:
             llvm \
             gcc-aarch64-linux-gnu \
             gcc-arm-linux-gnueabi \
-            gcc-multilib \
-            g++-multilib \
             libc6-dev \
             libc6-dev-i386 \
             linux-libc-dev \
