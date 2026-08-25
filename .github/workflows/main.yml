@@ -1,4 +1,4 @@
-name: Build Custom Kernel
+name: 🚀 Build Samsung M14 5G Kernel
 
 on:
   push:
@@ -8,14 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-kernel:
+    name: 🛠️ Compile Kernel (s5e8535)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: 📦 Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-            - name: Install Build Dependencies
+      - name: ⚙️ Install Build Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -36,16 +39,29 @@ jobs:
             lld \
             llvm
 
-
-      - name: Run Kernel Build Script
+      - name: 🏗️ Execute Kernel Build
         run: |
           chmod +x build_kernel.sh
           ./build_kernel.sh
 
-      - name: Upload Kernel Artifacts
+      - name: 📤 Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-build-output
+          name: Kernel-m14x-arm64
           path: |
             arch/arm64/boot/Image*
-            arch/arm64/boot/dts/
+            arch/arm64/boot/dtb*
+            arch/arm64/boot/dts/exynos/*.dtb
+
+      - name: 📊 Display Build Summary
+        if: always()
+        run: |
+          echo "### 📱 Kernel Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Device** | Samsung M14 5G (m14x) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **SOC Target** | Exynos 1330 (\`s5e8535\`) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Architecture** | ARM64 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Android Version** | 13 (Tiramisu) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Compiler** | Clang r450784d + LLVM |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Defconfig** | \`m14x_defconfig\` |" >> $GITHUB_STEP_SUMMARY
