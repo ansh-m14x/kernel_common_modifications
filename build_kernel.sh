@@ -1,34 +1,31 @@
 #!/bin/bash
 
-# Define Toolchain Paths
-export PATH=$(pwd)/toolchain/clang/host/linux-x86/clang-r450784d/bin:$PATH
-export PATH=$(pwd)/toolchain/build/kernel/build-tools/path/linux-x86/:$PATH
+# Define Toolchain Path (Proton Clang)
+export PATH=$(pwd)/proton-clang/bin:$PATH
 
-# Host Compiler & Linker Flags
-export HOSTCFLAGS="-I$(pwd)/toolchain/prebuilts/kernel-build-tools/linux-x86/include"
-export HOSTLDFLAGS="-L$(pwd)/toolchain/prebuilts/kernel-build-tools/linux-x86/lib64 -Wl,-rpath,$(pwd)/toolchain/prebuilts/kernel-build-tools/linux-x86/lib64 -fuse-ld=lld"
-
-# Target & System Architecture Flags
+# Architecture & Platform Setup
 export ARCH=arm64
+export SUBARCH=arm64
 export TARGET_SOC=s5e8535
 export PLATFORM_VERSION=13
 export ANDROID_MAJOR_VERSION=t
 export DTC_FLAGS="-@"
 export DEPMOD=depmod
 
-# Explicit LLVM Environment Bindings (Fixes missing llvm-ar / BPF build failures)
+# Proton Clang LLVM Toolchain Flags
+export CC=clang
+export CROSS_COMPILE=aarch64-linux-gnu-
+export CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
 export LLVM=1
 export LLVM_IAS=1
-export CC=clang
-export LD=ld.lld
-export AR=llvm-ar
-export NM=llvm-nm
-export OBJCOPY=llvm-objcopy
-export OBJDUMP=llvm-objdump
-export READELF=llvm-readelf
-export OBJSIZE=llvm-size
-export STRIP=llvm-strip
 
-# Execute Compilation
+# Generate Base Config
 make m14x_defconfig
+
+# Convert Full LTO to ThinLTO (Prevents link delays) & Fallback BTF Fix
+scripts/config --file .config --disable CONFIG_LTO_CLANG_FULL
+scripts/config --file .config --enable CONFIG_LTO_CLANG_THIN
+scripts/config --file .config --disable CONFIG_DEBUG_INFO_BTF
+
+# Start Multi-Threaded Build
 make -j$(nproc)
