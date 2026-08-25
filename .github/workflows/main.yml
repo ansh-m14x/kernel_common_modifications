@@ -1,0 +1,81 @@
+name: 🚀 Build Samsung M14 5G Kernel (Proton Clang)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name to checkout and build'
+        required: true
+        default: 'main'
+        type: string
+
+jobs:
+  build-kernel:
+    name: 🛠️ Compile Kernel (s5e8535)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 1
+
+      - name: ⚙️ Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            gcc-multilib \
+            g++-multilib \
+            libc6-dev \
+            libc6-dev-i386 \
+            linux-libc-dev \
+            bc \
+            bison \
+            flex \
+            libssl-dev \
+            libncurses-dev \
+            kmod \
+            cpio \
+            libelf-dev \
+            lld \
+            llvm \
+            dwarves
+
+      - name: 📥 Download Proton Clang
+        run: |
+          mkdir -p proton-clang
+          git clone --depth=1 https://github.com/kdrag0n/proton-clang.git proton-clang
+
+      - name: 🏗️ Execute Kernel Build
+        run: |
+          chmod +x build_kernel.sh
+          ./build_kernel.sh
+
+      - name: 📤 Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel-m14x-arm64
+          path: |
+            arch/arm64/boot/Image*
+            arch/arm64/boot/dtb*
+            arch/arm64/boot/dts/exynos/*.dtb
+
+      - name: 📊 Display Build Summary
+        if: always()
+        run: |
+          echo "### 📱 Kernel Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Device** | Samsung M14 5G (m14x) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **SOC Target** | Exynos 1330 (\`s5e8535\`) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Architecture** | ARM64 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Compiler** | Proton Clang (Latest) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **LTO Mode** | ThinLTO |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Built Branch** | \`${{ github.event.inputs.branch || github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+
