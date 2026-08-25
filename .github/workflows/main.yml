@@ -1,4 +1,4 @@
-name: 🚀 Build Samsung M14 5G Kernel
+name: 🚀 Build Samsung M14 5G Kernel (Proton Clang)
 
 on:
   push:
@@ -44,7 +44,13 @@ jobs:
             cpio \
             libelf-dev \
             lld \
-            llvm
+            llvm \
+            dwarves
+
+      - name: 📥 Download Proton Clang
+        run: |
+          mkdir -p proton-clang
+          git clone --depth=1 https://github.com/kdrag0n/proton-clang.git proton-clang
 
       - name: 🏗️ Execute Kernel Build
         run: |
@@ -69,7 +75,6 @@ jobs:
           echo "| **Target Device** | Samsung M14 5G (m14x) |" >> $GITHUB_STEP_SUMMARY
           echo "| **SOC Target** | Exynos 1330 (\`s5e8535\`) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Architecture** | ARM64 |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Android Version** | 13 (Tiramisu) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Compiler** | Clang r450784d + LLVM |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Defconfig** | \`m14x_defconfig\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Compiler** | Proton Clang (Latest) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **LTO Mode** | ThinLTO |" >> $GITHUB_STEP_SUMMARY
           echo "| **Built Branch** | \`${{ github.event.inputs.branch || github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
