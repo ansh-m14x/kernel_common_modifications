@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name to checkout and build'
+        required: true
+        default: 'main'
+        type: string
 
 jobs:
   build-kernel:
@@ -16,6 +22,7 @@ jobs:
       - name: 📦 Checkout Code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
           fetch-depth: 1
 
       - name: ⚙️ Install Build Dependencies
@@ -65,3 +72,4 @@ jobs:
           echo "| **Android Version** | 13 (Tiramisu) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Compiler** | Clang r450784d + LLVM |" >> $GITHUB_STEP_SUMMARY
           echo "| **Defconfig** | \`m14x_defconfig\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Built Branch** | \`${{ github.event.inputs.branch || github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
